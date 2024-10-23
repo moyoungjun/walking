@@ -1,0 +1,30 @@
+server:
+  port: 8000
+jwt:
+  header: Authorization
+  secretKey: hisecreykeyqwdhuqwdhquwhdioquwhdqwhdowqhdofghhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhqwhodwhqod
+  expiration: 500
+  refreshExpiration: 120960
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect  # 이 줄 추가
+
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  datasource:
+    username: root
+    password: wjsansrk
+    url: jdbc:mysql://localhost:3306/walking?useUnicode=true&characterEncoding=utf8
+
+logging:
+  level:
+    org:
+      springframework:
+        cloud: DEBUG
