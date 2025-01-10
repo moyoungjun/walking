@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
 import java.util.Collections;
 
 
@@ -16,11 +17,12 @@ public class AccountRequest{
     String password;
     String passwordConfirm;
     String userName;
-    public User toEntity() {
+    public User toEntity(String friendCode) {
         return User.builder()
                 .userId(userId)
                 .password(password)
-                .username(userName)
+                .userName(userName)
+                .friendCode(friendCode)
                 .authorities(Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")))
                 .build();
     }

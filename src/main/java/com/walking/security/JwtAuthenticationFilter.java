@@ -26,19 +26,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserRepository userRepository;
 
-    private final List<String> EXCLUDE_URL = List.of("/v3/**", "/swagger-ui/**", "/swagger-resources/**", "/swagger-ui.html", "/favicon.ico");
+    private final List<String> EXCLUDE_URL = List.of("/api/user/register","/api/auth","/v3/**", "/swagger-ui/**", "/swagger-resources/**", "/swagger-ui.html", "/favicon.ico");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String servletPath = request.getServletPath();
-        System.out.println("dddddddddddddddddd" + servletPath);
         if (EXCLUDE_URL.stream().anyMatch(exclude -> CommonUtils.match(exclude, servletPath))) {
             filterChain.doFilter(request, response);
-            System.out.println("여기니3");
         } else {
-            System.out.println("여기니2");
-            System.out.println("dddddddddddddddddd" + request);
-            System.out.println("dddddddddddddddddd" + response);
             try {
                 String token = resolveToken(request);
                 String userId = jwtService.getUserId(token);

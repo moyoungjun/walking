@@ -47,7 +47,7 @@ public class JwtService {
         headers.put("alg", "HS256");
 
         //Payload
-        Claims claims = Jwts.claims().setSubject(user.getUserId()).setId(user.getId().toString());
+        Claims claims = Jwts.claims().setSubject(user.getUserId()).setId(user.getUserSeq().toString());
         //Map<String, Object> payloads = new HashMap<>();
         //payloads.put("userId", user.getUsername());
 
@@ -64,9 +64,7 @@ public class JwtService {
 
     //토큰의 모든 정보 반환
     private Claims getAllClaims(String token){
-        System.out.println("토큰" +token );
         if (token == null || token.trim().isEmpty()) {
-        System.out.println("토큰2" + token);
             throw new IllegalArgumentException("JWT token is missing or empty");
         }
         return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).getBody();

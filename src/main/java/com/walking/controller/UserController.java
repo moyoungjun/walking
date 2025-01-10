@@ -26,7 +26,7 @@ public class UserController {
         return userService.getUsers();
     }
 
-    @PostMapping
+    @PostMapping("/register")
     public AccountResponse CreationUser(@RequestBody AccountRequest accountRequest) {
         return userService.CreationUser(accountRequest);
     }

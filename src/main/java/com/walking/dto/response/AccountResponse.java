@@ -4,7 +4,7 @@ import java.util.Set;
 
 
 public record AccountResponse(
-        Long id,
+        Long userSeq,
         String userId,
         String userName,
         Set<String> authorities

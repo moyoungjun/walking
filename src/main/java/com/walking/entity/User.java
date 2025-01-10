@@ -4,10 +4,12 @@ import com.walking.dto.converter.GrantedAuthoritySetAttributeConverter;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Set;
 
@@ -23,7 +25,7 @@ public class User implements UserDetails{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userSeq;
 
     @Comment("유저 아이디")
     private String userId;
@@ -32,7 +34,15 @@ public class User implements UserDetails{
     private String password;
 
     @Comment("유저 이름")
-    private String username;
+    private String userName;
+
+    @Comment("생성 일시")
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Comment("친구 코드")
+    private String friendCode;
 
     @Convert(converter = GrantedAuthoritySetAttributeConverter.class)
     private Set<GrantedAuthority> authorities;
@@ -48,7 +58,7 @@ public class User implements UserDetails{
     }
 
     public String getName() {
-        return username;
+        return userName;
     }
 
     @Override

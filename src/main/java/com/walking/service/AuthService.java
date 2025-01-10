@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import static com.walking.common.ErrorCode.INVALID_ID_PASSWORD;
+import static com.walking.common.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -20,10 +21,12 @@ public class AuthService {
     private final UserRepository userRepository;
 
     public AuthResponse authorize(AuthRequest authRequest) {
-        User user = userRepository.findByUserId(authRequest.userId());
+        User user = userRepository.findByUserId(authRequest.userId())
+                .orElseThrow(() -> new BaseException(USER_NOT_FOUND));
         if(!passwordEncoder.matches(authRequest.password(), user.getPassword())) {
             throw new BaseException(INVALID_ID_PASSWORD);
         }
+
         String token = jwtService.createJWT(user);
 
         return new AuthResponse("berear",token,jwtService.getExpiration(token));
