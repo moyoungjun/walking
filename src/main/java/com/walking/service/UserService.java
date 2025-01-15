@@ -47,7 +47,7 @@ public class UserService {
         User user = accountRequest.toEntity(generateUniqueFriendCode());
         userRepository.save(user);
         Set<String> authorities = user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
-        return new AccountResponse(user.getUserSeq(), user.getUsername(), user.getName(), authorities);
+        return new AccountResponse(user.getUserSeq(), user.getUserId(), user.getUsername(), authorities);
     }
 
     // 4자리 랜덤 친구 코드 생성 및 중복 방지 (알파벳 + 숫자)

@@ -47,7 +47,6 @@ public class User implements UserDetails{
     @Convert(converter = GrantedAuthoritySetAttributeConverter.class)
     private Set<GrantedAuthority> authorities;
 
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
@@ -57,10 +56,6 @@ public class User implements UserDetails{
         this.authorities = authorities;
     }
 
-    public String getName() {
-        return userName;
-    }
-
     @Override
     public String getPassword() {
         return password;
@@ -68,7 +63,7 @@ public class User implements UserDetails{
 
     @Override
     public String getUsername() {
-        return userId;
+        return userName;
     }
 
     @Override
@@ -90,4 +85,5 @@ public class User implements UserDetails{
     public boolean isEnabled() {
         return false;
     }
+
 }
