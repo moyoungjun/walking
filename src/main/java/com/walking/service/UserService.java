@@ -32,9 +32,7 @@ public class UserService {
     }
 
     public List<User> getUsers() {
-        List<User> users = userRepository.findAll();
-        System.out.println("this");
-        return users;
+        return userRepository.findAll();
     }
 
     public AccountResponse CreationUser(AccountRequest accountRequest) {

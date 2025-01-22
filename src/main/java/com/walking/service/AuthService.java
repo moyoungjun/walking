@@ -17,7 +17,7 @@ import static com.walking.common.ErrorCode.USER_NOT_FOUND;
 @RequiredArgsConstructor
 public class AuthService {
     private final PasswordEncoder passwordEncoder;
-    private final com.walking.service.JwtService jwtService;
+    private final JwtService jwtService;
     private final UserRepository userRepository;
 
     public AuthResponse authorize(AuthRequest authRequest) {
