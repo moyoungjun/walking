@@ -8,12 +8,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class WalkService {
     private final QWalkingRepository qWalkingRepository;
 
     public List<WalkResponse> getFriendWalkList(Long userSeq, PeriodType periodType) {
         return qWalkingRepository.findWalksByUserSeqAndPeriodType(userSeq, periodType);
     }
+
 }
