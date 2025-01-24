@@ -31,6 +31,7 @@ public class QWalkingImpl implements QWalkingRepository{
                         user.userName,
                         walk.walkDate,
                         walk.steps,
+                        walk.periodType,
                         walk.totalDistance))
                 .from(walk)
                 .join(user).on(walk.userSeq.eq(user.userSeq))
