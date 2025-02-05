@@ -1,12 +1,18 @@
 package com.walking.dto.request;
 
-import com.walking.enums.PeriodType;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-public record WalkRequest(
-        Long userSeq,
-        Integer steps,
-        Double totalDistance,
-        PeriodType periodType
+import java.util.Date;
 
-){
+@NoArgsConstructor
+@Getter
+@Setter
+public class WalkRequest {
+        Long userSeq;
+        Integer steps;
+        Double totalDistance;
+        Date startDate;
+        Date endDate;
 }

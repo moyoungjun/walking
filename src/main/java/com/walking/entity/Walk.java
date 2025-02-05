@@ -1,13 +1,12 @@
 package com.walking.entity;
 
-import com.walking.enums.PeriodType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-import java.time.LocalDate;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -27,18 +26,11 @@ public class Walk {
     @Column(name = "user_seq", nullable = false)
     private Long userSeq;
 
-    @Column(name = "walk_date", nullable = false)
-    private LocalDate walkDate;
-
     @Column(name = "steps", nullable = false)
     private Integer steps = 0;
 
-    @Column(name = "total_distance")
-    private Double totalDistance = 0.0;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "period_type")
-    private PeriodType periodType;
+    @Column(name = "total_distance", precision = 10, scale = 1)
+    private BigDecimal totalDistance = new BigDecimal("0.0");
 
     @Comment("등록 일시")
     @CreationTimestamp

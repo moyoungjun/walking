@@ -3,40 +3,44 @@ package com.walking.repository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.walking.dto.request.WalkSaveRequest;
 import com.walking.dto.response.WalkResponse;
 import com.walking.entity.QFriend;
 import com.walking.entity.QUser;
 import com.walking.entity.QWalk;
-import com.walking.enums.PeriodType;
+import com.walking.service.CommonService;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
 public class QWalkingImpl implements QWalkingRepository{
     private final JPAQueryFactory jpaQueryFactory;
 
+    private static final QUser user = QUser.user;
+    private static final QWalk walk = QWalk.walk;
+    private static final QFriend friend = QFriend.friend;
+
     public QWalkingImpl(JPAQueryFactory jpaQueryFactory) {
         this.jpaQueryFactory = jpaQueryFactory;
     }
 
-    public List<WalkResponse> findWalksByUserSeqAndPeriodType(Long userSeq, PeriodType periodType) {
-        QUser user = QUser.user;
-        QWalk walk = QWalk.walk;
-        QFriend friend = QFriend.friend;
 
+    public List<WalkResponse> findWalksByUserSeqAndPeriodType(Long userSeq, LocalDate startDate, LocalDate endDate) {
         return jpaQueryFactory
-                .select(Projections.constructor(WalkResponse.class,
+                .select(Projections.fields(WalkResponse.class,
                         walk.userSeq,
                         user.userName,
-                        walk.walkDate,
-                        walk.steps,
-                        walk.periodType,
-                        walk.totalDistance))
+                        walk.steps.sum().as("steps"),  // sum 처리
+                        walk.totalDistance.sum().as("totalDistance")  // sum 처리
+                ))
                 .from(walk)
                 .join(user).on(walk.userSeq.eq(user.userSeq))
                 .where(
-                        // 서브쿼리와 조건을 명확하게 그룹화
+                        // 친구 코드가 주어진 사용자 친구 코드에 포함된 경우 또는 동일 사용자일 경우
                         user.friendCode.in(
                                         JPAExpressions.select(friend.receiverFriendCode)
                                                 .from(friend)
@@ -44,9 +48,45 @@ public class QWalkingImpl implements QWalkingRepository{
                                                 .where(user.userSeq.eq(userSeq))
                                 )
                                 .or(user.userSeq.eq(userSeq))  // userSeq와 매핑
-                                .and(walk.periodType.eq(periodType)) // periodType 필터링
+                                .and(walk.regDatetime.between(startDate.atStartOfDay(), endDate.atTime(23, 59, 59)))  // 날짜 범위 조건
                 )
-                .orderBy(walk.steps.desc())
+                .groupBy(walk.userSeq, user.userName)
+                .orderBy(walk.steps.sum().desc()) // 총 걸음 수 기준 내림차순 정렬
                 .fetch();
+        }
+
+
+    public WalkResponse findByUserSeqAndDate(Long userSeq) {
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = today.atStartOfDay(); // 2025-02-04 00:00:00
+        LocalDateTime endOfDay = today.atTime(23, 59, 59); // 2025-02-04 23:59:59
+        return jpaQueryFactory
+                .select(Projections.fields(WalkResponse.class,
+                        walk.userSeq.as("userSeq"),
+                        user.userName.as("userName"),
+                        walk.steps.as("steps"),
+                        walk.totalDistance.as("totalDistance"),
+                        walk.regDatetime.as("regDatetime") // LocalDateTime 그대로 사용
+                ))
+                .from(walk)
+                .join(user).on(walk.userSeq.eq(user.userSeq))
+                .where(walk.userSeq.eq(userSeq)
+                        .and(walk.regDatetime.between(startOfDay, endOfDay)))
+                .fetchFirst();
     }
+
+    @Transactional
+    public boolean updateWalk(Long userSeq, WalkSaveRequest walkSaveRequest) {
+        long result = jpaQueryFactory.update(walk)
+                .set(walk.steps, walk.steps.add(walkSaveRequest.getSteps()))  // 덧셈 연산
+                .set(walk.totalDistance, walk.totalDistance.add(CommonService.calculateDistanceInKm(walkSaveRequest.getSteps()))) // 덧셈 연산
+                .where(walk.userSeq.eq(userSeq)
+                        .and(walk.regDatetime.year().eq(LocalDate.now().getYear()))
+                        .and(walk.regDatetime.month().eq(LocalDate.now().getMonthValue()))
+                        .and(walk.regDatetime.dayOfMonth().eq(LocalDate.now().getDayOfMonth()))
+                )  // 당일 날짜로 비교
+                .execute();
+        return result > 0;
+    }
+
 }
