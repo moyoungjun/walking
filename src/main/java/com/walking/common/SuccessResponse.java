@@ -18,7 +18,7 @@ public record SuccessResponse (
                     SuccessResponse.builder()
                             .result(result)
                             .data(data)
-                            .msg("성공")
+                            .msg(result ? "성공": "실패")
                             .build()
                 );
     }

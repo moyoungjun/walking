@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -31,6 +32,9 @@ public class Walk {
 
     @Column(name = "total_distance", precision = 10, scale = 1)
     private BigDecimal totalDistance = new BigDecimal("0.0");
+
+    @Column(name = "walk_day")
+    private LocalDate walkDay;
 
     @Comment("등록 일시")
     @CreationTimestamp

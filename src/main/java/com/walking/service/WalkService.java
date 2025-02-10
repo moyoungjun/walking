@@ -27,7 +27,7 @@ public class WalkService {
 
     public boolean insertMyWalkInfo(Long userSeq, WalkSaveRequest walkSaveRequest) {
         // 사용자와 날짜에 해당하는 Walk 데이터를 찾기
-        WalkResponse existingWalk = qWalkingRepository.findByUserSeqAndDate(userSeq);
+        WalkResponse existingWalk = qWalkingRepository.findByUserSeqAndDate(userSeq, walkSaveRequest.getDay());
 
         if (existingWalk != null) {
             // 기존 걸음수에 추가
@@ -43,6 +43,7 @@ public class WalkService {
             Walk newWalk = new Walk();
             newWalk.setUserSeq(userSeq);
             newWalk.setSteps(walkSaveRequest.getSteps());
+            newWalk.setWalkDay(walkSaveRequest.getDay());
             newWalk.setTotalDistance(CommonService.calculateDistanceInKm(walkSaveRequest.getSteps()));
             walkRepository.save(newWalk);
             return true;  // 성공 시 true 반환

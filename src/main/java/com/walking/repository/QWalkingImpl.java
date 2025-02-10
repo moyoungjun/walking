@@ -13,7 +13,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -56,22 +55,20 @@ public class QWalkingImpl implements QWalkingRepository{
         }
 
 
-    public WalkResponse findByUserSeqAndDate(Long userSeq) {
-        LocalDate today = LocalDate.now();
-        LocalDateTime startOfDay = today.atStartOfDay(); // 2025-02-04 00:00:00
-        LocalDateTime endOfDay = today.atTime(23, 59, 59); // 2025-02-04 23:59:59
+    public WalkResponse findByUserSeqAndDate(Long userSeq, LocalDate day) {
         return jpaQueryFactory
                 .select(Projections.fields(WalkResponse.class,
                         walk.userSeq.as("userSeq"),
                         user.userName.as("userName"),
                         walk.steps.as("steps"),
                         walk.totalDistance.as("totalDistance"),
+                        walk.walkDay.as("walkDay"),
                         walk.regDatetime.as("regDatetime") // LocalDateTime 그대로 사용
                 ))
                 .from(walk)
                 .join(user).on(walk.userSeq.eq(user.userSeq))
                 .where(walk.userSeq.eq(userSeq)
-                        .and(walk.regDatetime.between(startOfDay, endOfDay)))
+                        .and(walk.walkDay.eq(day)))  // LocalDate로 직접 비교
                 .fetchFirst();
     }
 
@@ -81,9 +78,9 @@ public class QWalkingImpl implements QWalkingRepository{
                 .set(walk.steps, walk.steps.add(walkSaveRequest.getSteps()))  // 덧셈 연산
                 .set(walk.totalDistance, walk.totalDistance.add(CommonService.calculateDistanceInKm(walkSaveRequest.getSteps()))) // 덧셈 연산
                 .where(walk.userSeq.eq(userSeq)
-                        .and(walk.regDatetime.year().eq(LocalDate.now().getYear()))
-                        .and(walk.regDatetime.month().eq(LocalDate.now().getMonthValue()))
-                        .and(walk.regDatetime.dayOfMonth().eq(LocalDate.now().getDayOfMonth()))
+                        .and(walk.walkDay.year().eq(walkSaveRequest.getDay().getYear()))
+                        .and(walk.walkDay.month().eq(walkSaveRequest.getDay().getMonthValue()))
+                        .and(walk.walkDay.dayOfMonth().eq(walkSaveRequest.getDay().getDayOfMonth()))
                 )  // 당일 날짜로 비교
                 .execute();
         return result > 0;

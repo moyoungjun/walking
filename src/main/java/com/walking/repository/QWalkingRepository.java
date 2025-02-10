@@ -9,7 +9,7 @@ import java.util.List;
 public interface QWalkingRepository{
     List<WalkResponse> findWalksByUserSeqAndPeriodType(Long userSeq, LocalDate startDate, LocalDate endDate);
 
-    WalkResponse findByUserSeqAndDate(Long userSeq);
+    WalkResponse findByUserSeqAndDate(Long userSeq, LocalDate day);
 
     boolean updateWalk(Long userSeq, WalkSaveRequest walkSaveRequest);
 }
